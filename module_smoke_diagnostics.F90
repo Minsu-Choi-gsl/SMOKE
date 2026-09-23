@@ -199,13 +199,13 @@ CONTAINS
       ! - in UPP, only bottom rho_phy is used, shouldn't we use rho_phy from that level (as below)?
             k = Kts
       do k = 1,3
-            qcloud2 = Qcloud(i,k,j)*Rho_phy(i,k,j)*1000._RKIND !max(qcloud2,qcloud(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
-            blcldw2 = Blcldw(i,k,j)*Rho_phy(i,k,j)*1000._RKIND !max(blcldw2,blcldw(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
-            qrain2 = Qrain(i,k,j)*Rho_phy(i,k,j)*1000._RKIND  !max(qrain2,qrain(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
-            qice2 = Qice(i,k,j)*Rho_phy(i,k,j)*1000._RKIND   ! max(qice2,qice(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
-            blcldi2 = Blcldi(i,k,j)*Rho_phy(i,k,j)*1000._RKIND !max(blcldi2,blcldi(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
-            qsnow2 = Qsnow(i,k,j)*Rho_phy(i,k,j)*1000._RKIND  !max(qsnow2,qsnow(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
-            qgrpl2 = Qgrpl(i,k,j)*Rho_phy(i,k,j)*1000._RKIND  !max(qgrpl2,qgrpl(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
+            qcloud2 = max(Qcloud(i,k,j)*Rho_phy(i,k,j)*1000._RKIND) !max(qcloud2,qcloud(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
+            blcldw2 = max(Blcldw(i,k,j)*Rho_phy(i,k,j)*1000._RKIND) !max(blcldw2,blcldw(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
+            qrain2 = max(Qrain(i,k,j)*Rho_phy(i,k,j)*1000._RKIND)  !max(qrain2,qrain(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
+            qice2 = max(Qice(i,k,j)*Rho_phy(i,k,j)*1000._RKIND)   ! max(qice2,qice(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
+            blcldi2 = max(Blcldi(i,k,j)*Rho_phy(i,k,j)*1000._RKIND) !max(blcldi2,blcldi(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
+            qsnow2 = max(Qsnow(i,k,j)*Rho_phy(i,k,j)*1000._RKIND)  !max(qsnow2,qsnow(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
+            qgrpl2 = max(Qgrpl(i,k,j)*Rho_phy(i,k,j)*1000._RKIND)  !max(qgrpl2,qgrpl(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
             extcoeff552 = Extcoef55(i,k,j)/Dz8w(i,k,j)
                                                    !max(extcoeff552,extcoeff55(i,k,j)) ! JLS - EXT55 is in units = 1/km, covert to 1/m
       enddo
