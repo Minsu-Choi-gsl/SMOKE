@@ -206,7 +206,7 @@ CONTAINS
             blcldi2 = max(Blcldi(i,k,j)*Rho_phy(i,k,j)*1000._RKIND) !max(blcldi2,blcldi(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
             qsnow2 = max(Qsnow(i,k,j)*Rho_phy(i,k,j)*1000._RKIND)  !max(qsnow2,qsnow(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
             qgrpl2 = max(Qgrpl(i,k,j)*Rho_phy(i,k,j)*1000._RKIND)  !max(qgrpl2,qgrpl(i,k,j)*rho_phy(i,k,j)*1000._RKIND)
-            extcoeff552 = Extcoef55(i,k,j)/Dz8w(i,k,j)
+            extcoeff552 = max(Extcoef55(i,k,j)/Dz8w(i,k,j))
                                                    !max(extcoeff552,extcoeff55(i,k,j)) ! JLS - EXT55 is in units = 1/km, covert to 1/m
       enddo
 
