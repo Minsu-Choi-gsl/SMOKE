@@ -44,18 +44,20 @@ module mpas_smoke_wrapper
 contains
 
     subroutine mpas_smoke_driver(                                                            &
-           configs, num_chem              , chemistry_start             , chem           ,            &
+           configs, num_chem              , chemistry_start             , chem           ,   &
            config_extra_chemical_tracers,                                                    &
            kanthro    , kbio, kfire, kvol, num_soil_types,                                   &
            config_ultrafine, config_coarse,                                                  &
            index_smoke_ultrafine , index_smoke_fine            , index_smoke_coarse,         &
-           index_soa, index_bbsoa, index_antsoa, index_bbvoc, index_antvoc,  config_soa_scheme, &
+           index_soa, index_bbsoa, index_antsoa, index_bbvoc, index_antvoc, index_biovoc,    &
+           index_biosoa,  config_soa_scheme,                                                 &
            index_bc, index_oc, index_brc,                                                    &
            index_dust_ultrafine  , index_dust_fine             , index_dust_coarse,          &
            index_ssalt_fine      , index_ssalt_coarse          ,                             &
            index_polp_tree       , index_polp_grass            , index_polp_weed,            &
            index_polp_all        , index_pols_all              ,                             &
            index_pols_tree       , index_pols_grass            , index_pols_weed,            &
+           index_ISOP            , index_TERP                  , index_SESQ,                 &
            index_unspc_ultrafine , index_unspc_fine            , index_unspc_coarse,         &
            index_no3_a_fine      , index_so4_a_fine            , index_nh4_a_fine,           &
            index_nh3             , index_so2                   , index_ch4,                  &
@@ -79,10 +81,11 @@ contains
            index_e_ant_pt_in_smoke_ultrafine,index_e_ant_pt_in_smoke_fine, index_e_ant_pt_in_smoke_coarse,   &
            index_e_ant_pt_in_no3_a_fine, index_e_ant_pt_in_so4_a_fine, &
            index_e_ant_pt_in_nh4_a_fine, index_e_ant_pt_in_so2, &
-           index_e_ant_pt_in_nh3, index_e_ant_pt_in_ch4,                                           &
-           index_e_ant_pt_in_co, index_e_ant_pt_in_nox, index_e_ant_pt_in_voc,                        &
+           index_e_ant_pt_in_nh3, index_e_ant_pt_in_ch4,                                     &
+           index_e_ant_pt_in_co, index_e_ant_pt_in_nox, index_e_ant_pt_in_voc,               &
            index_e_ant_pt_in_bc, index_e_ant_pt_in_oc,                                       &
            index_e_bio_in_polp_tree, index_e_bio_in_polp_grass, index_e_bio_in_polp_weed,    &
+           index_e_bio_in_ISOP, index_e_bio_in_TERP, index_e_bio_in_SESQ,                    &
            index_e_vol_in_vash_fine, index_e_vol_in_vash_coarse,                             &
            index_e_bb_out_smoke_ultrafine, index_e_bb_out_smoke_fine, index_e_bb_out_smoke_coarse, & 
            index_e_bb_out_nox, index_e_bb_out_ch4,index_e_bb_out_co,                         &
@@ -96,6 +99,7 @@ contains
            index_e_ant_out_co, index_e_ant_out_nox, index_e_ant_out_voc,                     &
            index_e_ant_out_bc, index_e_ant_out_oc,                                           &
            index_e_bio_out_polp_tree, index_e_bio_out_polp_grass, index_e_bio_out_polp_weed, &
+           index_e_bio_out_ISOP, index_e_bio_out_TERP, index_e_bio_out_SESQ,                 &
            index_e_vol_out_vash_fine,  index_e_vol_out_vash_coarse,                          &
            index_e_dust_out_dust_ultrafine, index_e_dust_out_dust_fine, index_e_dust_out_dust_coarse,  &
            index_e_ss_out_ssalt_fine, index_e_ss_out_ssalt_coarse,                           &
@@ -251,11 +255,13 @@ contains
     integer, intent(in),optional :: &
                            index_smoke_ultrafine, index_smoke_fine, index_smoke_coarse,&
                            index_soa, index_bbsoa, index_antsoa, index_bbvoc, index_antvoc, &
+                           index_biovoc, index_biosoa, &
                            index_dust_ultrafine, index_dust_fine,  index_dust_coarse,               &
                            index_polp_tree,  index_polp_grass,   index_polp_weed,   &
                            index_pols_tree,  index_pols_grass,   index_pols_weed,   &
                            index_pols_all,   index_polp_all,                        &
-                           index_unspc_ultrafine, index_unspc_fine, index_unspc_coarse,                    &
+                           index_ISOP, index_TERP, index_SESQ,                      &
+                           index_unspc_ultrafine, index_unspc_fine, index_unspc_coarse,  &
                            index_ssalt_fine, index_ssalt_coarse,                    &
                            index_so4_a_fine, index_no3_a_fine, index_nh4_a_fine,    &
                            index_so2, index_nh3, index_ch4,                         &
@@ -286,7 +292,8 @@ contains
                            index_e_ant_pt_in_bc, index_e_ant_pt_in_oc
    integer, intent(in),optional :: &
                            index_e_bio_in_polp_tree, index_e_bio_in_polp_grass, index_e_bio_in_polp_weed, &
-                           index_e_vol_in_vash_fine,  index_e_vol_in_vash_coarse
+                           index_e_vol_in_vash_fine,  index_e_vol_in_vash_coarse, &
+                           index_e_bio_in_ISOP, index_e_bio_in_TERP, index_e_bio_in_SESQ
    integer, intent(in),optional :: &
                            index_e_bb_out_smoke_ultrafine, index_e_bb_out_smoke_fine, index_e_bb_out_smoke_coarse, &
                            index_e_bb_out_ch4, index_e_bb_out_co, index_e_bb_out_nox, index_e_bb_out_nh3, index_e_bb_out_so2, &
@@ -304,7 +311,8 @@ contains
                            index_e_bio_out_polp_tree, index_e_bio_out_polp_grass, index_e_bio_out_polp_weed, &
                            index_e_vol_out_vash_fine,  index_e_vol_out_vash_coarse, &
                            index_e_dust_out_dust_ultrafine, index_e_dust_out_dust_fine, index_e_dust_out_dust_coarse, &
-                           index_e_ss_out_ssalt_fine, index_e_ss_out_ssalt_coarse
+                           index_e_ss_out_ssalt_fine, index_e_ss_out_ssalt_coarse, &
+                           index_e_bio_out_ISOP, index_e_bio_out_TERP, index_e_bio_out_SESQ
     integer, intent(in),optional ::  index_STKHT, index_STKDM, index_STKTK, index_STKVE, index_STKLT, index_STKLG
 ! 2D dust input arrays 
     real(RKIND),intent(in), dimension(ims:ime, jms:jme),optional  :: sandfrac_in, clayfrac_in, uthres_in, &        ! dust (FENGSHA) input
@@ -478,10 +486,12 @@ contains
       call set_scalar_indices(chemistry_start,                                     &
                     index_smoke_ultrafine, index_smoke_fine, index_smoke_coarse,   &
                     index_soa, index_bbsoa, index_antsoa, index_bbvoc,index_antvoc,&
+                    index_biovoc, index_biosoa, &
                     index_dust_ultrafine, index_dust_fine, index_dust_coarse,      &
                     index_polp_tree, index_polp_grass, index_polp_weed,            &
                     index_pols_tree, index_pols_grass, index_pols_weed,            &
                     index_pols_all,  index_polp_all,                               &
+                    index_ISOP, index_TERP, index_SESQ,                            &
                     index_unspc_ultrafine, index_unspc_fine, index_unspc_coarse,   &
                     index_ssalt_fine, index_ssalt_coarse,                          &
                     index_no3_a_fine, index_so4_a_fine, index_nh4_a_fine,          &
@@ -990,41 +1000,29 @@ contains
     if  (do_timing) call mpas_timer_stop('wetdep_ls')
     endif
 
-    ! Simple AOD diagnostic at every chemistry timestep
-    call mpas_aod_simple( &
-         chem, aod3d_simple, rho_phy, relhum, dz8w, num_chem, &
-         ims,ime, jms,jme, kms,kme,                           &
-         its,ite, jts,jte, kts,kte )
-
-    ! Mie calculation schedule
+! Adding aerosol optics tstep
     do_mie   = (config_mie_aod_opt > 0)
     call_mie = do_mie .and. (mie_frq > 0)
-
+    
     if (call_mie) then
       mie_interval_secs = 60.0_RKIND*real(mie_frq,RKIND)
-
+      
       call_mie =                                         &
            (int((curr_secs - dt) / mie_interval_secs) <  &
-            int(curr_secs / mie_interval_secs)) .or.    &
-           (ktau == 1) .or. (ktau == 2)
+            int((curr_secs) / mie_interval_secs)) .or.   &
+           (ktau == 2)
     endif
 
-    ! Use simple AOD when Mie is disabled
-    ! This code written with its own purpose
-    ! for UPP
-    if (.not. do_mie) then
-      aod3d(its:ite,kts:kte,jts:jte) = &
-           aod3d_simple(its:ite,kts:kte,jts:jte)
-    endif
+    call_aod = call_mie .or. (.not. do_mie)
 
-    if (call_mie) then
+    if (call_aod) then
       allocate(tauaersw(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(gaersw  (ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(waersw  (ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(tauaerlw(ims:ime,kms:kme,jms:jme,1:NLWBANDS))
       allocate(extaersw(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(bscoefsw(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
-
+      
       allocate(l2aer(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(l3aer(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(l4aer(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
@@ -1032,7 +1030,7 @@ contains
       allocate(l6aer(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(l7aer(ims:ime,kms:kme,jms:jme,1:NSWBANDS))
       allocate(extaerlw(ims:ime,kms:kme,jms:jme,1:NLWBANDS))
-
+      
       tauaer_lw_p = 0.0_RKIND
       tauaer_sw_p = 0.0_RKIND
       ssaaer_sw_p = 1.0_RKIND
@@ -1049,17 +1047,18 @@ contains
       l6aer    = 0.0_RKIND
       l7aer    = 0.0_RKIND
       extaerlw = 0.0_RKIND
-
-      call mpas_log_write(' Calling Aerosol Optical Properties Calculation')
-      call mpas_aod_mie( config_mie_aod_opt, curr_secs, &
-                    chem, aod3d, rho_phy, relhum, dz8w, num_chem, &
+      
+      
+      call mpas_log_write( ' Calling Aerosol Optical Properties Calculation')
+      call mpas_aod_diag( config_mie_aod_opt, curr_secs, &
+                    chem, aod3d, aod3d_simple, rho_phy, relhum, dz8w, num_chem,  &
                     tauaer_sw_p, extaersw, asyaer_sw_p, ssaaer_sw_p, bscoefsw, &
                     l2aer, l3aer, l4aer, l5aer, l6aer, l7aer,      &
                     tauaer_lw_p, extaerlw,                         &
                     ids,ide, jds,jde, kds,kde,                     &
                     ims,ime, jms,jme, kms,kme,                     &
                     its,ite, jts,jte, kts,kte )
-
+      
       deallocate(tauaersw)
       deallocate(extaersw)
       deallocate(gaersw)
@@ -1138,11 +1137,17 @@ contains
        case (2)
          call mpas_log_write('Calling simple SOA driver: BB-SOA, Ant-SOA')
          call simple_soa_voc(dt, chem, num_chem, swdown, coszen, &
-              rho_phy, dz8w,                                      &
+              xlat, area, rho_phy, dz8w,                          &
               ebu(:,:,:,index_e_bb_in_co),                        &
               e_ant_out(:,:,:,index_e_ant_out_co),                &               
               p_bbvoc, p_antvoc,                                  &
               p_bbsoa, p_antsoa,                                  &
+              e_bio_in, kbio, num_e_bio_in,                       &
+              index_e_bio_in_ISOP,                                &
+              index_e_bio_in_TERP,                                &
+              index_e_bio_in_SESQ,                                &
+              p_biovoc, p_biosoa,                                 &
+              julday,                                      &
               ids, ide, jds, jde, kds, kde,                       &
               ims, ime, jms, jme, kms, kme,                       &
               its, ite, jts, jte, kts, kte                              )
@@ -1272,7 +1277,7 @@ contains
     do j=jts,jte
     do k=kts,kte
     do i=its,ite
-      theta_phy(i,k,j) = t_phy(i,k,j)/pi_phy(i,k,j)
+      theta_phy(i,k,j) = t_phy(i,k,j)/pi_phy(i,k,j)*cp
       wind_phy(i,k,j) = sqrt(u_phy(i,k,j)**2. + v_phy(i,k,j)**2.)
       rri(i,k,j) = 1._RKIND/rho_phy(i,k,j)
     enddo
