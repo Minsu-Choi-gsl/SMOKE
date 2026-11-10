@@ -179,9 +179,6 @@ contains
   real(RKIND), parameter :: mw_co       = 28.0_RKIND      ! g mol-1
   real(RKIND), parameter :: mw_air      = 0.02897_RKIND   ! kg mol-1
 
-  ! Initial biogenic test: 1:1 mass yield
-  real(RKIND), parameter :: soa_bio_yld = 1.0_RKIND
-
   ! Biogenic molecular weights: g mol-1
   real(RKIND), parameter :: mw_isop = 68.12_RKIND
   real(RKIND), parameter :: mw_terp = 136.24_RKIND
@@ -240,8 +237,7 @@ contains
 
      aging_frac = 1.0_RKIND - exp(-koh * oh_eff * dtstep)
 
-     if (p_biovoc > 0 .and. p_biovoc <= num_chem .and. &
-         p_biosoa > 0 .and. p_biosoa <= num_chem) then
+     if (p_biosoa > 0 .and. p_biosoa <= num_chem) then
 
         if (kbio >= 1 .and. &
             index_e_bio_in_ISOP >= 1 .and. &
@@ -313,12 +309,12 @@ contains
                 0.05_RKIND * bio_isop * mw_isop + &
                 0.10_RKIND * bio_terp * mw_terp + &
                 0.10_RKIND * bio_sesq * mw_sesq) / 3600.0_RKIND
-
-           voc_add = dtstep * bio_flux / &
+          
+           soa_add = dtstep * bio_flux / &
                      (rho_phy(i,kts,j) * dz8w(i,kts,j))
-
-           chem(i,kts,j,p_biovoc) = &
-                chem(i,kts,j,p_biovoc) + voc_add
+          
+           chem(i,kts,j,p_biosoa) = &
+                chem(i,kts,j,p_biosoa) + soa_add
 
         endif
      endif
@@ -386,29 +382,9 @@ contains
 
            endif
         endif
-
-        ! Transported bioVOC precursor -> bioSOA
-        if (p_biovoc > 0 .and. p_biovoc <= num_chem .and. &
-            p_biosoa > 0 .and. p_biosoa <= num_chem) then
-
-           if (aging_frac > 0.0_RKIND .and. &
-               chem(i,k,j,p_biovoc) > epsilc) then
-
-              soa_add = aging_frac * chem(i,k,j,p_biovoc)
-
-              chem(i,k,j,p_biovoc) = &
-                   chem(i,k,j,p_biovoc) - soa_add
-
-              chem(i,k,j,p_biosoa) = &
-                   chem(i,k,j,p_biosoa) + soa_add
-
-           endif
-        endif
-
      enddo
   enddo
   enddo
-
   end subroutine simple_soa_voc  
   !-----------------------------------------------------------------------
   ! Reduced two-product SOA scheme,

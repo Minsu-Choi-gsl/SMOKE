@@ -136,9 +136,6 @@ CONTAINS
     if (p_so4_a_fine < 1 .or. p_so4_a_fine > num_chem) return
     if (p_no3_a_fine < 1 .or. p_no3_a_fine > num_chem) return
 
-    ! Bookkeeping array for the unspecified PM (see unspc_tmp above).
-    ! On (re)allocation it starts from the current field, so no mass is
-    ! speciated retroactively; at ktau==1 it is zeroed cell by cell below.
     IF ( p_unspc_fine>=1 .AND. p_unspc_fine<=num_chem ) THEN
       IF ( ALLOCATED(unspc_tmp) ) THEN
         IF ( ANY(LBOUND(unspc_tmp)/=(/ims,kms,jms/)) .OR. &
@@ -146,12 +143,11 @@ CONTAINS
       ENDIF
       IF ( .NOT.ALLOCATED(unspc_tmp) ) THEN
         ALLOCATE(unspc_tmp(ims:ime,kms:kme,jms:jme))
-        unspc_tmp = max(0._RKIND,chem(:,:,:,p_unspc_fine))
+        unspc_tmp = 0.0_RKIND
+        unspc_tmp(its:ite,kts:kte,jts:jte) = MAX(0.0_RKIND, chem(its:ite,kts:kte,jts:jte,p_unspc_fine))
       ENDIF
     ENDIF
 
-    ! dz8w, nifa, and nwfa are retained for a future
-    ! aerosol-number-dependent relaxation timescale.
     DO j = Jts , Jte
        DO k = Kts , Kte
           DO i = Its , Ite
